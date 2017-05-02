@@ -50,9 +50,9 @@
         timeline: [audio_calibration_trial],
         loop_function: function(data) {
             if (data[0].button_pressed == -1) { // no button pressed, continue loop
-                return false;
-            } else { // button pressed, end loop
                 return true;
+            } else { // button pressed, end loop
+                return false;
             }
         }
     }; 
