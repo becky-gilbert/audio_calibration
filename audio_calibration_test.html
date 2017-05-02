@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Audio calibration</title>
+    <script src = "jquery.min.js" type="text/javascript"></script>
+    <script src = "jspsych-5.0.3/jspsych.js" type="text/javascript"></script>
+    <script src = "jspsych-5.0.3/plugins/jspsych-instructions.js" type="text/javascript"></script>
+    <script src = "jspsych-5.0.3/plugins/jspsych-single-audio-.js" type="text/javascript"></script>
+    <script src = "jspsych-5.0.3/plugins/jspsych-button-response.js"></script>
+    <script src = "jspsych-5.0.3/plugins/jspsych-text.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="jspsych-5.0.3/css/jspsych_BG_btn.css">
+    <!-- <script src="/assets/javascripts/jatos.js"></script> -->
+</head>
+<body>
+</body>
+<script type="text/javascript">
+    var file_path = "audio/";
+    var file_name = "T6_57.mp3";
+    var full_file_name = [file_path, file_name].join("");
+    var audio_html = "<div><audio src='" + full_file_name + "' autoplay></div><div><p>Please adjust the volume on your computer. When you are finished, click the 'Done' button.</p></div>";
+    var timeline = [];
+
+    var start_task = {
+        type: 'instructions',
+        pages: ['<p><br>Before we begin, you will need to set the volume on your computer to a comfortable ' +
+                'level.<br><br>When you click "Next", you will hear a sentence repeated in a loop.' +
+                '<br><br>You should set your computer&#39;s volume so that you can hear the audio ' +
+                'comfortably and clearly.<br><br>After you&#39;ve done this, please do not adjust the ' +
+                'volume again for the remainder of the experiment.</p>'],
+        show_clickable_nav: true,
+        timing_post_trial: 1000,
+        data: {task_segment: 'instructions'}
+    };
+    timeline.push(start_task);
+
+    var audio_calibration_trial = {
+        type: 'button-response',
+        stimulus: audio_html,
+        is_html: true,
+        choices: ['done'],
+        button_html: "<button class='jspsych-btn'>Done</button>", 
+        timing_stim: 4000,
+        timing_response: 4000,
+        timing_post_trial: 0,
+        data: {task_segment: 'audio_calibration'}
+    };
+
+    var audio_calibration_loop = {
+        timeline: [audio_calibration_trial],
+        loop_function: function(data) {
+            if (data[0].button_pressed == -1) { // no button pressed, continue loop
+                return false;
+            } else { // button pressed, end loop
+                return true;
+            }
+        }
+    }; 
+    timeline.push(audio_calibration_loop);
+
+    // preload audio manually
+    jsPsych.pluginAPI.preloadAudioFiles([full_file_name], function(){startExperiment();}, function(){console.log("loading...");});
+
+    function startExperiment() {
+        jsPsych.init({
+            timeline: timeline,
+            fullscreen: true,
+            default_iti: 0,
+            show_progress_bar: false,
+            on_finish: function() {
+                jsPsych.data.displayData('json');
+                //var resultJson = JSON.stringify(jsPsych.data.getData());
+                //jatos.submitResultData(resultJson, jatos.startNextComponent);
+            }
+        });
+    }
+</script>
+</html>
